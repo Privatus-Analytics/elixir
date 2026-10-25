@@ -178,6 +178,10 @@ The package decides the environment like this:
    production. If you build a staging release, set `env` (step 1) or
    `enabled: false` so staging is not counted.
 
+If `queue_stub` is on, the tag still prints the small queue stub (and nothing
+else), so `privatus.track` calls in your own JavaScript keep working. They
+wait in a queue and are never sent.
+
 To see the tag while you build, set `config :privatus_analytics, enabled: true`
 in `config/dev.exs`. The tracker also ignores `localhost` unless you pass
 `data-allow-local` or `data-debug` (see [Debug
@@ -316,6 +320,11 @@ and sent once it arrives:
 <PrivatusAnalytics.Components.tag queue_stub={true} />
 ```
 
+The stub prints even when the tag is off (in development, without a site id,
+or with `enabled: false`). Only the stub prints then: no tracker and no page
+props. So your `privatus.track` calls never fail; they wait in the queue and
+are never sent.
+
 Or print it alone with `PrivatusAnalytics.queue_stub(nonce: @csp_nonce)`. See the
 [JavaScript API docs](https://privatusanalytics.com/docs/tracker/javascript-api).
 
@@ -341,17 +350,18 @@ const Hooks = {
   PrivatusProps: {
     mounted() { this.send() },
     updated() { this.send() },
-    send() { window.privatus && window.privatus.props(JSON.parse(this.el.dataset.privatusProps)) }
+    send() { window.privatus.props(JSON.parse(this.el.dataset.privatusProps)) }
   },
   TrackOnMount: {
-    mounted() { window.privatus && window.privatus.track(this.el.dataset.event) }
+    mounted() { window.privatus.track(this.el.dataset.event) }
   }
 }
 let liveSocket = new LiveSocket("/live", Socket, { hooks: Hooks, params: { _csrf_token: csrfToken } })
 ```
 
-Use the queue stub (`queue_stub={true}`) so these calls are not lost if the
-tracker has not loaded yet.
+Turn on the queue stub (`queue_stub={true}`) in the root layout. Then
+`window.privatus` is always there, so these calls are kept if the tracker has
+not loaded yet, and never fail in development.
 
 ### Where to see it
 
@@ -365,6 +375,15 @@ tracker has not loaded yet.
 The script sets no cookies and stores nothing in the browser. See the
 [privacy documentation](https://privatusanalytics.com/docs/privacy) for what is
 collected.
+
+If you have a privacy policy, it should say which tools handle your visitors' data. You can paste this:
+
+> This website uses [Privatus Analytics](https://privatusanalytics.com/privacy-analytics) to count visits. It
+> does not use cookies and does not follow you from one website to another. Your IP address is used for a moment
+> to count visits and is never stored.
+
+Change it to fit your site. The [privacy policy generator](https://privatusanalytics.com/tools/privacy-policy-generator)
+makes a longer version with your site's name in it.
 
 ## Development
 

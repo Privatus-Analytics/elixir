@@ -80,4 +80,10 @@ defmodule PrivatusAnalytics.PlugTest do
 
     assert conn.resp_body =~ ~s|data-modules="vitals" data-props="privatusPageProps" nonce="xyz"|
   end
+
+  test "adds nothing when the tag is off, even with the queue stub on" do
+    configure(enabled: false)
+
+    assert run(@page, queue_stub: true).resp_body == @page
+  end
 end

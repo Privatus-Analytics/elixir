@@ -169,4 +169,55 @@ defmodule PrivatusAnalytics.TagTest do
     assert html =~ String.trim_trailing(@stub)
     assert {:safe, "<script>window.privatus=" <> _} = PrivatusAnalytics.queue_stub()
   end
+
+  @stub_js "window.privatus=window.privatus||{q:[]};['track','pageview','props','optOut','optIn','ready'].forEach(function(m){window.privatus[m]=window.privatus[m]||function(){window.privatus.q.push([m,Array.prototype.slice.call(arguments)])}})"
+
+  describe "when the tag is off" do
+    test "prints only the queue stub, with the nonce, when the stub is on" do
+      html =
+        PrivatusAnalytics.tag_string(
+          enabled: false,
+          queue_stub: true,
+          nonce: "abc",
+          props: %{plan: "pro"}
+        )
+
+      assert html == ~s(<script nonce="abc">#{@stub_js}</script>)
+
+      assert PrivatusAnalytics.tag(enabled: false, queue_stub: true) ==
+               {:safe, "<script>#{@stub_js}</script>"}
+    end
+
+    test "prints nothing when the stub is off" do
+      assert PrivatusAnalytics.tag_string(
+               enabled: false,
+               queue_stub: false,
+               props: %{plan: "pro"}
+             ) ==
+               ""
+    end
+
+    test "prints only the queue stub without a site id" do
+      configure(site_id: nil)
+
+      assert PrivatusAnalytics.tag_string(queue_stub: true, props: %{plan: "pro"}) ==
+               "<script>#{@stub_js}</script>"
+    end
+
+    test "prints only the queue stub outside the enabled environments" do
+      configure(enabled: nil, queue_stub: true)
+
+      assert PrivatusAnalytics.tag_string() == "<script>#{@stub_js}</script>"
+    end
+
+    test "does not call a props function" do
+      parent = self()
+      configure(props: fn _conn -> send(parent, :called) && %{plan: "pro"} end)
+
+      assert PrivatusAnalytics.tag_string(enabled: false, queue_stub: true) ==
+               "<script>#{@stub_js}</script>"
+
+      refute_received :called
+    end
+  end
 end

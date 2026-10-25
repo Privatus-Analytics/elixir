@@ -18,7 +18,8 @@ if Code.ensure_loaded?(Phoenix.Component) do
     @doc """
     The Privatus Analytics script tag.
 
-    Prints nothing without a site id or when the tag is not enabled.
+    Without a site id or when the tag is not enabled, prints only the queue stub
+    (with `queue_stub={true}`) or nothing.
     """
     attr :site_id, :string, doc: "Overrides the site id."
     attr :script_host, :string, doc: "Overrides the script host."

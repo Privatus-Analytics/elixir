@@ -42,7 +42,8 @@ defmodule PrivatusAnalytics do
 
       <%= PrivatusAnalytics.tag(nonce: @csp_nonce) %>
 
-  Prints nothing without a site id or when the tag is not enabled.
+  Without a site id or when the tag is not enabled, prints only the queue stub
+  (with `queue_stub: true`) or nothing.
   """
   @spec tag(options()) :: {:safe, String.t()}
   def tag(opts \\ []), do: {:safe, tag_string(opts)}

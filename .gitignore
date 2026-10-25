@@ -9,3 +9,5 @@ erl_crash.dump
 privatus_analytics-*.tar
 /tmp/
 .DS_Store
+/example/_build/
+/example/deps/

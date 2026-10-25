@@ -23,23 +23,33 @@ defmodule PrivatusAnalytics.Tag do
     Config.site_id(opts) != nil and Config.enabled?(opts)
   end
 
-  @doc "The full HTML as a string. Empty when no tag should print."
+  @doc """
+  The full HTML as a string. When the tag is off (disabled or no site id) it
+  is only the queue stub (if `queue_stub` is on) or empty, and a props
+  function is never called.
+  """
   def render(opts) do
     opts = Config.normalize(opts)
+    stub? = Config.option(opts, :queue_stub, false) == true
 
-    if render?(opts) do
-      nonce = nonce(opts)
-      props = page_props(opts)
+    cond do
+      render?(opts) ->
+        nonce = nonce(opts)
+        props = page_props(opts)
 
-      [
-        Config.option(opts, :queue_stub, false) == true && inline_script(@queue_stub, nonce),
-        props != [] && inline_script(props_js(props), nonce),
-        "<script " <> HTML.attributes(attributes(opts, props != [], nonce)) <> "></script>"
-      ]
-      |> Enum.filter(&is_binary/1)
-      |> Enum.join("\n")
-    else
-      ""
+        [
+          stub? && inline_script(@queue_stub, nonce),
+          props != [] && inline_script(props_js(props), nonce),
+          "<script " <> HTML.attributes(attributes(opts, props != [], nonce)) <> "></script>"
+        ]
+        |> Enum.filter(&is_binary/1)
+        |> Enum.join("\n")
+
+      stub? ->
+        inline_script(@queue_stub, nonce(opts))
+
+      true ->
+        ""
     end
   end
 

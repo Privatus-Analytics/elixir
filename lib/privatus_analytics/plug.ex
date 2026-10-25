@@ -34,11 +34,15 @@ if Code.ensure_loaded?(Plug.Conn) do
 
     @doc false
     def inject(conn, opts) do
+      opts = Keyword.put(opts, :conn, conn)
+
+      # A tag that is off inserts nothing, not even the queue stub.
       with true <- injectable?(conn),
+           true <- PrivatusAnalytics.enabled?(opts),
            body = IO.iodata_to_binary(conn.resp_body),
            false <- String.contains?(body, @marker),
            true <- Regex.match?(@head_close, body),
-           tag when tag != "" <- PrivatusAnalytics.tag_string(Keyword.put(opts, :conn, conn)) do
+           tag when tag != "" <- PrivatusAnalytics.tag_string(opts) do
         body = Regex.replace(@head_close, body, fn head -> tag <> "\n" <> head end, global: false)
 
         %{conn | resp_body: body}

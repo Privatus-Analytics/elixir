@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- When the tag is off (disabled, outside production or no site id) and `queue_stub` is on,
+  the tag prints only the queue stub, so `privatus.track` calls never fail. No tracker and
+  no page props script print then, and a props function is not called.
+- `PrivatusAnalytics.Plug` inserts nothing when the tag is off.
+- Add the conformance example app in `example/` (Phoenix with HEEx).
+- README: a privacy policy paragraph you can paste.
+
 ## 1.0.0 - 2026-10-25
 
 - Initial release.
