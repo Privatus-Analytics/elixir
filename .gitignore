@@ -1,0 +1,11 @@
+SUBMISSION.md
+/_build/
+/deps/
+/doc/
+/cover/
+/.fetch
+erl_crash.dump
+*.ez
+privatus_analytics-*.tar
+/tmp/
+.DS_Store
