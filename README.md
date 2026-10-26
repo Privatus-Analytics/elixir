@@ -1,17 +1,44 @@
 # Privatus Analytics for Elixir and Phoenix
 
-Adds the cookieless [Privatus Analytics](https://privatusanalytics.com)
-tracking script to your Phoenix or Plug app. Use the function component in
-your layout, or add a Plug that puts the script in the `<head>` for you.
+**Simple, private website analytics for your Phoenix app. No cookies, honest numbers,
+and a dashboard you understand in seconds.**
 
-Privatus Analytics counts visits, sources, pages and conversions without
-cookies, local storage or fingerprinting, so analytics does not need a consent
-banner by itself. Check with your own counsel for your country.
+## Why Privatus Analytics
 
-The package only prints HTML: the browser script and a few HTML attributes. It
-never sends events from your server, sets no cookies, and never reads IP
-addresses or browser details. You need a Privatus Analytics account to see
-reports, and there is a free plan. Sign up at https://privatusanalytics.com.
+**Google Analytics is slow, confusing and hungry for data.** It sends what your
+visitors do to Google. In many countries it means showing a cookie pop-up (the box
+that asks visitors to accept cookies), and many people click "reject", so you never
+see them. Bots pad the numbers that are left.
+
+**Privatus Analytics fixes that.** It counts visits to your Phoenix app without cookies and
+never stores IP addresses. Bots are filtered out before they are counted. Your
+data is never sold or shared.
+
+What you get:
+
+- **A dashboard you understand in seconds.** Visitors, top pages and where people
+  came from, all on one screen.
+- **No cookie pop-up needed for our analytics.** We set no cookies and store no
+  personal data. Laws differ by country, so check your own legal advice.
+- **Honest numbers.** Known bots and fake traffic are left out on every plan.
+- **A fast site.** The tracking script is about 3 KB, tiny next to most tracking tags.
+- **Data you own.** We never sell it or show you ads, and you can pull it out
+  any time through the API.
+
+**Start free.** The Free plan has 10,000 events a month and 3 sites, with no card.
+Every new account also gets 14 days of Pro free, with no card.
+[Create your account](https://privatusanalytics.com).
+
+## What this package does
+
+- A function component for your Phoenix layout, or a Plug that puts the script
+  in the `<head>` for you.
+- The package only prints HTML: the browser script and a few HTML attributes.
+- It never sends events from your server, sets no cookies, and never reads IP
+  addresses or browser details.
+
+You need a Privatus Analytics account to see your reports, and there is a
+free plan. [Sign up at privatusanalytics.com](https://privatusanalytics.com).
 
 ## Requirements
 
@@ -203,7 +230,7 @@ signed-in staff, render the tag only for everyone else:
 ## Product analytics: see which features people use
 
 You can learn which features people use without any user ids. Tag the
-buttons and pages that matter, and Privatus counts them.
+buttons and pages that matter, and Privatus Analytics counts them.
 
 A good naming style is "Noun verb", like `Report exported` or `Invite sent`.
 Keep the name short and put the details in properties.
@@ -300,7 +327,7 @@ later one wins when two set the same key. Numbers, booleans and lists of text
 keep their type. The JSON is escaped so it is safe inside a `<script>`.
 
 **Never put names, emails, user ids or anything else that points to one
-person in props.** Privatus counts visitors without any id, so put groups
+person in props.** Privatus Analytics counts visitors without any id, so put groups
 (plan, role), not people. The server also removes emails and long ids, but do
 not rely on that.
 
@@ -322,7 +349,7 @@ and sent once it arrives:
 
 The stub prints even when the tag is off (in development, without a site id,
 or with `enabled: false`). Only the stub prints then: no tracker and no page
-props. So your `privatus.track` calls never fail; they wait in the queue and
+props. So your `privatus.track` calls never fail. They wait in the queue and
 are never sent.
 
 Or print it alone with `PrivatusAnalytics.queue_stub(nonce: @csp_nonce)`. See the
